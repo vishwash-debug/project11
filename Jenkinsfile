@@ -1,7 +1,7 @@
 pipeline {
     agent { label "${LABEL_NAME}" }
     environment { 
-        IMAGE_NAME = "simpleapp1234"
+        IMAGE_NAME = "simpleapp"
         IMAGE_TAG  = "${BUILD_NUMBER}"
         DOCKER_IMAGE = "${IMAGE_NAME}:${IMAGE_TAG}"
         
@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage ( 'CODE' ) {
             steps {
-                git url:"https://github.com/vishwash-debug/agentdocker.git" , branch: "main"                 
+                git url:"https://github.com/vishwash-debug/project11.git" , branch: "main"                 
             }
         }
         stage ( 'build' ) {
