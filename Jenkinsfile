@@ -1,67 +1,51 @@
 pipeline {
-    agent { label "${LABEL_NAME}"}
-
-    environment {
-        IMAGE_NAME = "netapp"
+    agent { label "${LABEL_NAME}" }
+    environment { 
+        IMAGE_NAME = "simpleapp1234"
         IMAGE_TAG  = "${BUILD_NUMBER}"
         DOCKER_IMAGE = "${IMAGE_NAME}:${IMAGE_TAG}"
+        
     }
-
     stages {
-
-        stage('CODE') {
+        stage ( 'CODE' ) {
             steps {
-                git url:"https://github.com/vishwash-debug/project11", branch:"main"
+                git url:"https://github.com/vishwash-debug/agentdocker.git" , branch: "main"                 
             }
         }
-
-        stage('Build') {
-            steps {
-                    sh 'docker build -t ${DOCKER_IMAGE} .'
-                }
-            }
-
-        stage('Deploy') {
-            steps {
-                    sh """
-                      docker stop net1 || true
-                      docker rm net1 || true
-                      docker run -d --name net1 -p 80:80 --restart always ${DOCKER_IMAGE}
-                    """
-                }
-        }
+        stage ( 'build' ) {
+             steps {
+                 sh "docker build -t ${DOCKER_IMAGE} ."
+             }
+        }   
+        
+         stage ('deploy') {
+               steps {
+                   sh "docker stop c1 || true"
+                   sh "docker rm c1 || true"
+                   sh "docker run -d --name c1 -p 80:80 ${DOCKER_IMAGE} sleep infinity"
+                   
+               }
     }
-
+}
     post {
-
         success {
-            archiveArtifacts artifacts: '*.tar', fingerprint: true
-
             emailext(
-                subject: "SUCCESS: Job '${JOB_NAME} [${BUILD_NUMBER}]'",
-                body: """
-                    <p>Build Successful</p>
-                    <p>Job: ${JOB_NAME}</p>
-                    <p>Build Number: ${BUILD_NUMBER}</p>
-                    <p>Docker Image: ${DOCKER_IMAGE}</p>
-                """,
-                mimeType: 'text/html',
-                to: 'prazwalvishwash@gmail.com'
+            body: '''THIS MAIL IS REGARDING THE successful BUILD.
+FOR THE REFERENCE CHECK COSNSOLE OUTPUT OF ${BUILD_NUMBER}''', 
+    subject: 'Congratulationsss Build successful ${BUILD_NAME}', 
+    to: 'prazwalvishwash@gmail.com'
             )
         }
-
         failure {
             emailext(
-                subject: "FAILED: Job '${JOB_NAME} [${BUILD_NUMBER}]'",
-                body: """
-                    <p>Build Failed</p>
-                    <p>Job: ${JOB_NAME}</p>
-                    <p>Build Number: ${BUILD_NUMBER}</p>
-                    <p>Please check Jenkins logs.</p>
-                """,
-                mimeType: 'text/html',
-                to: 'prazwalvishwash@gmail.com'
+            body: '''THIS MAIL IS REGARDING THE FAILED BUILD.
+FOR THE REFERENCE CHECK COSNSOLE OUTPUT OF ${BUILD_NUMBER}''', 
+    subject: 'WARNING!!!!! Build Failed ${BUILD_NAME}', 
+    to: 'prazwalvishwash@gmail.com'
             )
         }
-    }
+
+                }
+            
+        
 }
